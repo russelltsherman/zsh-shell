@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# allow for automated install of xcode cli tools and git clone of baseline repo
+
+set -o errtrace
+set -o functrace
+set -o errexit
+set -o nounset
+set -o pipefail
+
+EXTENSIONS=(
+  coc-emmet
+  coc-eslint
+  coc-eslint
+  coc-explorer
+  coc-flow
+  coc-git
+  coc-go
+  coc-html
+  coc-json
+  coc-markdownlint
+  coc-pairs
+  coc-prettier
+  coc-python
+  coc-snippets
+  coc-spell-checker
+  coc-tsserver
+  coc-xml
+  coc-yaml
+  coc-yank
+)
+
+cmd=""
+
+for extension in "${EXTENSIONS[@]}"
+do
+  cmd="$cmd :CocInstall $extension"
+done
+
+vim -c "$cmd"

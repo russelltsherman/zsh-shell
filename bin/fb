@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+#
+
+usage() {
+  echo "$0"
+}
+
+facebook() {
+  local res
+  case "$1" in
+    login)
+      res=$(facebook-cli login)
+      echo "$res"
+      ;;
+    logout)
+      facebook-cli logout
+      ;;
+    *)
+      usage; exit
+      ;;
+  esac
+}
+
+# _facebook() {
+#
+# }
+
+facebook "$@"

@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Generate a file tree table of contents for a directory of markdown files
+
+run from command line:
+
+    $ ./vimwikiindex path
+
+"""
+import re
+import os
+import argparse
+
+
+TAG_OPEN = '<!-- TOC_BEGIN -->'
+TAG_CLOSE = '<!-- TOC_END -->'
+
+
+def create_index(cwd, recursive):
+    md_lines = []
+    md_exts = ['.markdown', '.mdown', '.mkdn', '.mkd', '.md']
+
+    for root, dirs, files in os.walk(cwd):
+        dirs = sorted([d for d in dirs if not d[0] == '.'])
+        if len(dirs) > 0:
+            for dirname in dirs:
+                md_lines.append(
+                    '[{}]({}/index.md)\n'.format(dirname, dirname))
+                if recursive:
+                    create_index(os.path.join(root, dirname), recursive)
+
+        files = sorted([f for f in files if not f[0] ==
+                        '.' and os.path.splitext(f)[-1] in md_exts])
+        if len(files) > 0:
+            for filename in files:
+                if filename != 'index.md':
+                    file = os.path.splitext(filename)[0]
+                    md_lines.append('[{}]({})\n'.format(file, filename))
+
+        break
+
+    md_out_fn = os.path.join(cwd, 'index.md')
+    if len(md_lines) > 0:
+        replace_index(md_out_fn, md_lines)
+    set_title(md_out_fn, root)
+
+
+def set_title(filename, title):
+    with open(filename) as f:
+        title_line = "# {}\n".format(os.path.basename(title))
+        first_line = f.readline()
+
+        if first_line != title_line:
+            with open(filename) as f:
+                lines = f.readlines()  # read
+
+            lines.insert(0, title_line)
+
+            with open(filename, "w") as f:
+                f.writelines(lines)  # write back
+
+
+def replace_index(filename, contents):
+    """
+    finds the old index in filename and replaces it with the lines in new_index
+    if no existing index places new index at end of file
+    if file doesn't exist creates it and adds new index
+    will only replace the first index block in file  (why would you have more?)
+    """
+
+    pre_index = []
+    index = ["{}\n\n".format(TAG_OPEN)]
+    index.extend(contents)
+    index.append("\n{}\n".format(TAG_CLOSE))
+    post_index = []
+    pre = True
+    post = False
+    try:
+        with open(filename, 'r') as md_in:
+            for line in md_in:
+                if TAG_OPEN in line:
+                    pre = False
+                if TAG_CLOSE in line:
+                    post = True
+                if pre:
+                    pre_index.append(line)
+                if post:
+                    post_index.append(line)
+    except FileNotFoundError:
+        pass
+
+    with open(filename, 'w') as md_out:
+        md_out.writelines(pre_index)
+        md_out.writelines(index)
+        md_out.writelines(post_index[1:])
+
+
+def main():
+    """generate index optional cmd line arguments"""
+    parser = argparse.ArgumentParser(
+        description=('generate a markdown index tree of markdown files'
+                     'in current working directory and its sub folders'))
+    parser.add_argument('dir',
+                        default=os.getcwd(),
+                        help="directory path to index")
+
+    parser.add_argument("--recursive",
+                        action='store_true',
+                        default=True,
+                        help="generate index recursively")
+
+    args = parser.parse_args()
+
+    create_index(args.dir, args.recursive)
+
+
+if __name__ == "__main__":
+    main()

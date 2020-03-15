@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# set -x
+
+# find script location
+DIR="$( cd "$( dirname $0:A )" && pwd )"
+
+function usage() {
+  cat <<- EOF
+
+  create SSH Keys for user
+
+  usage: $0 <email>
+
+EOF
+}
+
+function main() {
+  mkdir -p $HOME/.ssh/$EMAIL
+
+  for f in $HOME/.ssh/$EMAIL/id_rsa*; do
+      ## Check if the glob gets expanded to existing files.
+      ## If not, f here will be exactly the pattern above
+      ## and the exists test will evaluate to false.
+      if [ ! -f "$f" ]; then
+        ssh-keygen -t rsa -b 4096 -f ~/.ssh/$EMAIL/id_rsa -q -N "" -C "$EMAIL"
+        # Then add your new key to the ssh-agent:
+        # start the ssh-agent in the background
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/$EMAIL/id_rsa
+      fi
+
+      break
+  done
+
+  for f in $HOME/.ssh/$EMAIL/id_ed25519*; do
+      ## Check if the glob gets expanded to existing files.
+      ## If not, f here will be exactly the pattern above
+      ## and the exists test will evaluate to false.
+      if [ ! -f "$f" ]; then
+        ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/$EMAIL/id_ed25519 -q -N "" -C "$EMAIL"
+        # Then add your new key to the ssh-agent:
+        # start the ssh-agent in the background
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/$EMAIL/id_ed25519
+      fi
+
+      break
+  done
+}
+
+[ "$#" -lt 1 ] && usage && exit 1
+
+EMAIL=${1:-}
+
+main "$@"

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# allow for automated install of xcode cli tools and git clone of baseline repo
+
+set -o errtrace
+set -o functrace
+set -o errexit
+set -o nounset
+set -o pipefail
+
+DIR="$( cd "$( dirname $0:A )" && pwd )"
+
+MANIFEST=$(cat "$DIR/../dotfiles/.vim/pack/manifest")
+IFS=$'\r\n' GLOBIGNORE='*' command eval 'REPOS=($MANIFEST)'
+
+for repo in "${REPOS[@]}"
+do
+  case $repo in
+    \"*);;
+    \#*);;
+    *)
+      repo=$(echo "$repo" | cut -d' ' -f1)
+      org=$(echo "$repo"  | cut -d/ -f1)
+      plugin=$(echo "$repo" | cut -d/ -f2)
+      version=$(echo "$plugin" | cut -d: -f2)
+      plugin=$(echo "$plugin" | cut -d: -f1)
+
+      if [ "$version" == "$plugin" ]
+      then
+        version="master"
+      fi
+
+      echo "$org/$plugin:$version"
+      echo "#######################################################################"
+
+      if [[ -d "$DIR/../dotfiles/.vim/pack/$org/start/$plugin" ]]
+      then
+        verb="pull"
+      else
+        verb="add"
+      fi
+
+      git subtree "$verb" \
+        --prefix "dotfiles/.vim/pack/$org/start/$plugin" \
+        "https://github.com/$org/$plugin" "$version" --squash
+    ;;
+  esac
+done
