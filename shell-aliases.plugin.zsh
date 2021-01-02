@@ -19,8 +19,6 @@ alias dnsflush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder; e
 # recursive dos2unix in current directory
 alias dos2lf='dos2unix `find ./ -type f`'
 
-alias edit='docker run -ti --rm -v $(pwd):/home/developer/workspace jare/vim-bundle'
-
 # Empty the Trash on all mounted volumes and the main HDD.
 # Also, clear Apple’s System Logs to improve shell startup speed.
 # Finally, clear download history from quarantine. https://mths.be/bum
@@ -101,7 +99,6 @@ alias pushup="git-up && git push"
 # alias qltext='xattr -wx com.apple.FinderInfo "54 45 58 54 21 52 63 68 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00" $1'
 #alias qltext2='osascript -e tell application "Finder" to set file type of ((POSIX file "$1") as alias) to "TEXT"'
 
-alias reload="exec \${SHELL} -l" # Reload the shell (i.e. invoke as a login shell)
 
 alias sha265sum='shasum -a 256 ' # Print or Check SHA Checksums
 
@@ -121,5 +118,5 @@ alias week='date +%V' # Get week number
 
 # recursively show recently changed file
 function changed() {
-  find "$1" -type f -print0 | xargs -0 stat --format '%Y :%y %n' 2>/dev/null | sort -nr | cut -d: -f2-
+  find "${1:-.}" -type f -print0 | xargs -0 stat --format '%Y :%y %n' 2>/dev/null | sort -nr | cut -d: -f2-
 }
