@@ -11,7 +11,7 @@ run from command line:
 import re
 import os
 import argparse
-
+from pathlib import Path
 
 TAG_OPEN = '<!-- TOC_BEGIN -->'
 TAG_CLOSE = '<!-- TOC_END -->'
@@ -47,6 +47,7 @@ def create_index(cwd, recursive):
 
 
 def set_title(filename, title):
+    Path(filename).touch()
     with open(filename) as f:
         title_line = "# {}\n".format(os.path.basename(title))
         first_line = f.readline()
