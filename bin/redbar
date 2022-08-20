@@ -17,11 +17,11 @@ EOF
 
 function main() {
   # sync local changes to redbar
-  sudo mirror ~/src /Volumes/REDBAR01
-  sudo mirror ~/"VirtualBox VMs" /Volumes/REDBAR01
+  sudo rsync --archive --progress ~/src /Volumes/REDBAR01
+  sudo rsync --archive --progress ~/"VirtualBox VMs" /Volumes/REDBAR01
 
-  sudo mirror ~/src /Volumes/REDBAR02
-  sudo mirror ~/"VirtualBox VMs" /Volumes/REDBAR02
+  sudo rsync --archive --progress ~/src /Volumes/REDBAR02
+  sudo rsync --archive --progress ~/"VirtualBox VMs" /Volumes/REDBAR02
 
   # # sync redbar changes to local
   # sudo mirror /Volumes/REDBAR01/src ~/
