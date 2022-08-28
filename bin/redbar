@@ -17,14 +17,14 @@ EOF
 
 function main() {
   # sync local changes to redbar
-  sudo rsync --archive --progress ~/src /Volumes/REDBAR01
-  sudo rsync --archive --progress ~/"VirtualBox VMs" /Volumes/REDBAR01
+  sudo rsync --archive --progress --filter=':- .gitignore' ~/src /Volumes/REDBAR01
+  sudo rsync --archive --progress --filter=':- .gitignore' ~/"VirtualBox VMs" /Volumes/REDBAR01
+  echo "end REDBAR01"
 
-  sudo rsync --archive --progress ~/src /Volumes/REDBAR02
-  sudo rsync --archive --progress ~/"VirtualBox VMs" /Volumes/REDBAR02
+  sudo rsync --archive --progress --filter=':- .gitignore' ~/src /Volumes/REDBAR02
+  sudo rsync --archive --progress --filter=':- .gitignore' ~/"VirtualBox VMs" /Volumes/REDBAR02
+  echo "endREDBAR02"
 
-  # # sync redbar changes to local
-  # sudo mirror /Volumes/REDBAR01/src ~/
   exit 0
 }
 
